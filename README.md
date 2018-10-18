@@ -1,6 +1,3 @@
-# florida-elections
-To fetch and parse Florida election results for McClatchy markets to elex-format JSON
-
 This is an effort to download Florida election results in near-real time, and convert them into the Elex format. This was a joint effort between the Palm Beach Post and the Miami Herald. Those with questions can email Mike Stucka at mstucka@pbpost.com  and Caitlin Ostroff at costroff@mcclatchydc.com.
 
 Everything below is certainly outdated but possibly relevant so maybe it'll get cleaned up. Sometime.
