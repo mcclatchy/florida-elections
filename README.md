@@ -1,7 +1,5 @@
 This is an effort to download Florida election results in near-real time, and convert them into the Elex format. This was a joint effort between the Palm Beach Post and the Miami Herald. Those with questions can email Mike Stucka at mstucka@pbpost.com  and Caitlin Ostroff at costroff@mcclatchydc.com.
 
-Everything below is certainly outdated but possibly relevant so maybe it'll get cleaned up. Sometime.
-
 This is an effort to parse county-level results for Miami-Dade, Broward, Monroe and Manatee. It also pulls from the state's county-wide file.
 
 ## Setup: Install the requirements
