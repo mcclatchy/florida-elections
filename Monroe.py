@@ -20,7 +20,7 @@ filepath = snapshotsdir + (countyname) + "/" + timestamp + "/"
 raceResults = []
 def getResults():
 
-    html = urllib.request.urlopen("https://enr.electionsfl.org/MON/1863/Summary/")
+    html = urllib.request.urlopen("https://enr.electionsfl.org/MON/Summary/1997/")
     bsObj = BeautifulSoup(html, "html5lib")
     #find all of the races
     resultsSection = bsObj.findAll("div", {"class":"Race row"})
