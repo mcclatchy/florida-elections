@@ -25,8 +25,8 @@ os.makedirs(filepath, exist_ok=True)
 getcontext().prec = 10      # Precision
 
 # We need an elexcode like 20180828 but electiondate is m/d/yyyy.
-vodka = electiondate.split("/")
-elexcode = vodka[2] + vodka[0].zfill(2) + vodka[1].zfill(2)
+thing = electiondate.split("/")
+elexcode = thing[2] + thing[0].zfill(2) + thing[1].zfill(2)
 
 baseurl = "http://fldoselectionfiles.elections.myflorida.com/enightfilespublic/"
 
@@ -50,11 +50,9 @@ print("Done downloading Florida data. Now parsing ...")
 
 """
         NEED TO BUILD FIELD DESCRIPTIONS. Asking on AP for copyright.
-
         Not parsing anything for description, delegatecount, electiondate, electtotal, electwon,
         incumbent, initalization_data, is_ballot_measure, last_updated, level,
         officeid, party, runoff, seatname, seatnum, test, uncontested, winner
-
         Really should look at last_updated, electiondate
 """
 
@@ -71,7 +69,7 @@ headers = [
 
 print("Parsing " + filepath)
 
-masterraces = OrderedDict()
+allraces = OrderedDict()
 mastercandidates = OrderedDict()
 masterunits = OrderedDict()
 
@@ -92,18 +90,18 @@ for row in rows:
             fields = row.split("|")
             fields = [item.strip() for item in fields]   # Lose any extra whitespace
             junk, junk, junk, racename, electiontype, raceid = fields
-            masterraces[raceid] = {}
-            masterraces[raceid]["electiontype"] = electiontype
-            masterraces[raceid]["racename"] = racename
-            masterraces[raceid]["Candidates"] = OrderedDict()
-            masterraces[raceid]['Counties'] = OrderedDict()
+            allraces[raceid] = {}
+            allraces[raceid]["electiontype"] = electiontype
+            allraces[raceid]["racename"] = racename
+            allraces[raceid]["Candidates"] = OrderedDict()
+            allraces[raceid]['Counties'] = OrderedDict()
         elif row[0] == "c":   # If we have a candidate identifier
             fields = row.split("|")
             fields = [item.strip() for item in fields]   # Lose any extra whitespace
             junk, junk, junk, raceid, candidatelastname, candidatefirstname, candidateid = fields
-            masterraces[raceid]['Candidates'][candidateid] = {}
-            masterraces[raceid]['Candidates'][candidateid]['firstname'] = candidatefirstname
-            masterraces[raceid]['Candidates'][candidateid]['lastname'] = candidatelastname
+            allraces[raceid]['Candidates'][candidateid] = {}
+            allraces[raceid]['Candidates'][candidateid]['firstname'] = candidatefirstname
+            allraces[raceid]['Candidates'][candidateid]['lastname'] = candidatelastname
             mastercandidates[candidateid] = raceid
         elif row[0] == "u":
             fields = row.split("|")
@@ -115,8 +113,8 @@ for row in rows:
             fields = [item.strip() for item in fields]   # Lose any extra whitespace
             junk, junk, junk, raceid, unitid, precincts = fields
             precincts = int(precincts)
-            masterraces[raceid]['Counties'][unitid] = OrderedDict()
-            masterraces[raceid]['Counties'][unitid]['Precincts'] = precincts
+            allraces[raceid]['Counties'][unitid] = OrderedDict()
+            allraces[raceid]['Counties'][unitid]['Precincts'] = precincts
         else:
             print("Florida: Found non-conforming row: " + row)
 
@@ -135,35 +133,44 @@ for row in rows:
     for item in headers:
         line[item] = ""
     votes = int(votes)
-    precinctsreporting = int(precinctsreporting)
-    lookups = {
-        "id": "Florida " + raceid + "-" + reportingunitid,
-        "raceid": raceid,
-        "racetype": masterraces[raceid]['electiontype'],
-        "racetypeid": masterraces[raceid]['electiontype'],
-        "ballotorder": int(seqno),
-        "candidateid": "Florida " + candidateid,
-        "first": masterraces[raceid]['Candidates'][candidateid]['firstname'],
-        "last": masterraces[raceid]['Candidates'][candidateid]['lastname'],
-        "national": "FALSE",
-        "officename": masterraces[raceid]["racename"],
-        "polid": "Florida " + candidateid,
-        "precinctsreporting": int(precinctsreporting),
-        "precinctstotal": masterraces[raceid]['Counties'][reportingunitid]['Precincts'],
-        "precinctsreportingpct": Decimal(precinctsreporting) / Decimal(masterraces[raceid]['Counties'][reportingunitid]['Precincts']),
-        "reportingunitid": reportingunitid,
-        "reportingunitname": masterunits[reportingunitid],
-        "statename": "Florida",
-        "statepostal": "FL",
-        "votecount": int(votes)
-    }
-    for key in lookups:
-        line[key] = lookups[key]
-    if line["id"] not in votedict:
-        votedict[line["id"]] = 0
-    votedict[line["id"]] += votes
-    # print(line)
-    masterlist.append(line)
+    if raceid not in allraces:
+        print("Race not found in dictionary: " + row)
+    else:
+        precinctsreporting = int(precinctsreporting)
+        lookups = {
+            "id": "Florida " + raceid + "-" + reportingunitid,
+            "raceid": raceid,
+            "racetype": allraces[raceid]['electiontype'],
+            "ballotorder": int(seqno),
+            "candidateid": "Florida " + candidateid,
+            "first": allraces[raceid]['Candidates'][candidateid]['firstname'],
+            "last": allraces[raceid]['Candidates'][candidateid]['lastname'],
+            "national": "FALSE",
+            "polid": "Florida " + candidateid,
+            "precinctsreporting": int(precinctsreporting),
+            "precinctstotal": allraces[raceid]['Counties'][reportingunitid]['Precincts'],
+            "precinctsreportingpct": Decimal(precinctsreporting) / Decimal(allraces[raceid]['Counties'][reportingunitid]['Precincts']),
+            "reportingunitid": reportingunitid,
+            "reportingunitname": masterunits[reportingunitid],
+            "statename": "Florida",
+            "statepostal": "FL",
+            "votecount": int(votes)
+        }
+        for key in lookups:
+            line[key] = lookups[key]
+        racename = allraces[raceid]["racename"]
+        line['officename'] = racename.split(",")[0].strip()
+        line['seatname'] = ", ".join(racename.split(",")[1:]).strip().replace("  ", " ")
+        racetype = line['racetype']
+        if racetype == "Republican Primary":
+            line['racetypeid'] = "R"
+        elif racetype == "Democratic Primary":
+            line['racetypeid'] = "D"
+        if line["id"] not in votedict:
+            votedict[line["id"]] = 0
+        votedict[line["id"]] += votes
+        # print(line)
+        masterlist.append(line)
 
 
 # Circle back through and calculate percentage of vote
@@ -172,11 +179,8 @@ for counter, row in enumerate(masterlist):
     if votedict[row['id']] == 0 or votedict[row['id']] == "0":
         masterlist[counter]["votepct"] = 0
     else:
-        # print(row['votecount'])
-    # print(row['id'])
-    # print(votedict[row['id']])
         masterlist[counter]["votepct"] = Decimal(row['votecount']) / Decimal(votedict[row['id']])
-
+        masterlist[counter]["electtotal"] = votedict[row["id"]]
 
 partylookup = {}
 with open(filepath + "results.txt", "r") as f:
