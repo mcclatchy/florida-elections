@@ -15,11 +15,11 @@ import configuration   # Local file, configuration.py, with settings
 rawtime = datetime.datetime.now()
 snapshotsdir = configuration.snapshotsdir
 electiondate = configuration.electiondate
-targetdir = configuration.targetdir
+targetdir = configuration.snapshotsdir
 timestamp = datetime.datetime.strftime(rawtime, "%Y%m%d-%H%M%S")
 filepath = snapshotsdir + "Florida/" + timestamp + "/"
 lastupdated = datetime.datetime.strftime(rawtime, "%Y-%m-%dT%H:%M:%S")
-targetfilename = targetdir + "20-Florida.csv"
+targetfilename = filepath + "Florida.csv"
 os.makedirs(targetdir, exist_ok=True)
 os.makedirs(filepath, exist_ok=True)
 getcontext().prec = 10      # Precision
@@ -48,13 +48,6 @@ for filetype in filetypes:
         f.write(requests.get(baseurl + elexcode + remote).content)
 print("Done downloading Florida data. Now parsing ...")
 
-"""
-        NEED TO BUILD FIELD DESCRIPTIONS. Asking on AP for copyright.
-        Not parsing anything for description, delegatecount, electiondate, electtotal, electwon,
-        incumbent, initalization_data, is_ballot_measure, last_updated, level,
-        officeid, party, runoff, seatname, seatnum, test, uncontested, winner
-        Really should look at last_updated, electiondate
-"""
 
 headers = [
     "id", "raceid", "racetype", "racetypeid", "ballotorder", "candidateid",
