@@ -11,7 +11,7 @@ import json
 from decimal import *
 from collections import OrderedDict
 import datetime
-
+import titlecase
 
 def bring_clarity(rawtime, countyname):
 
@@ -19,13 +19,15 @@ def bring_clarity(rawtime, countyname):
     # Except Florida has more than one time zone.
 
     snapshotsdir = configuration.snapshotsdir
-    targetdir = configuration.targetdir
+    targetdir = configuration.snapshotsdir
     filename = configuration.filename
     electiondate = configuration.electiondate
     timestamp = datetime.datetime.strftime(rawtime, "%Y%m%d-%H%M%S")
     lastupdated = datetime.datetime.strftime(rawtime, "%Y-%m-%dT%H:%M:%S")
+    statename = 'Florida'
+    reportingunitname = 'Miami-Dade'
     filepath = snapshotsdir + (countyname) + "/" + timestamp + "/"
-    targetfilename = filepath + "70-" + (countyname) + ".csv"
+    targetfilename = filepath + (countyname) + ".csv"
     os.makedirs(snapshotsdir, exist_ok=True)
 
     getcontext().prec = 10      # Precision
@@ -97,13 +99,16 @@ def bring_clarity(rawtime, countyname):
         line['electiondate'] = electiondate
         line['lastupdated'] = lastupdated
         line['level'] = "subunit"
+        line['statename'] = statename
+        line['reportingunitname'] = reportingunitname
         masterlist.append(line)
 
     for i, line in enumerate(masterlist):
         masterlist[i]["electtotal"] = racevotes[line["raceid"]]
-
-    line =  {k.lower(): v for k, v in line.items()}
-
+    # ATTEMPT AT MAKING THIS LOOK LIKE NORMAL PROSE
+    # for i, line in enumerate(masterlist):
+    #     for item in line:
+    #         masterlist[i][item] = titlecase(line[item])
 
     with open(targetfilename, "w", newline="") as f:
         writer = csv.writer(f)
