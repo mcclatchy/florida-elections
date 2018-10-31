@@ -12,12 +12,16 @@ from slugify import slugify
 import configuration   # Local file, configuration.py, with settings
 import clarityparser    # Local file, clarityparser.py
 
+
 countyname = "Monroe"    # Critical to have this!
 rawtime = datetime.datetime.now()
 snapshotsdir = configuration.snapshotsdir
 timestamp = datetime.datetime.strftime(rawtime, "%Y%m%d-%H%M%S")
 filepath = snapshotsdir + (countyname) + "/" + timestamp + "/"
 raceResults = []
+lastupdated = datetime.datetime.strftime(rawtime, "%Y-%m-%dT%H:%M:%S")
+electiondate = '11/6/2018'
+level = 'subunit'
 def getResults():
 
     html = urllib.request.urlopen("https://enr.electionsfl.org/MON/Summary/1997/")
@@ -71,6 +75,10 @@ def getResults():
                 'reportingunitname': "Monroe",
                 'statename': 'Florida',
                 'statepostal': 'FL',
+                'lastupdated': lastupdated,
+                'electiondate': electiondate,
+                'precinctsreportingpct': "",
+                'level': level
             }
             raceResults.append(raceResult)
 getResults()
