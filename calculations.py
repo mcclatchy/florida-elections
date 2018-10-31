@@ -71,6 +71,7 @@ def countyResults():
                 df['party'] = df['party'].str.title()
                 df['party'] = df['party'].astype(str)
                 df['party'] = df['party'].replace(['Rep', 'Dem', 'Npa', 'Lpf', 'Ref'],['Republican Party', 'Democratic Party', 'No Party Affiliation', 'Libertarian Party', 'Reform Party'])
+                dfs.append(df)
             if '/snapshots/Monroe' in filename or '/snapshots/Broward' in filename or '/snapshots/Manatee' in filename:
                 files.append(filename)
                 for filename in files:
@@ -84,7 +85,7 @@ def countyResults():
                     df['votepct'] = df['votecount']/df['totalvotesinrace']
                     df['precinctsreportingpct'] = df['precinctsreporting']/df['precinctstotal']
                     dfs.append(df)
-            r = pd.concat([df for df in dfs], axis=0)
+            r = pd.concat([df for df in dfs], axis=0, sort=True)
             df_clean = r.drop_duplicates()
             df_clean.to_csv('countyagg.csv')
             csvfile = open('countyagg.csv', 'r')
