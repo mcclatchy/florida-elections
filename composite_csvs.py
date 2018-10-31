@@ -36,15 +36,16 @@ def composite_csvs():
         newestdirectory = sorted_files[-1]
         csvs = sorted(list(glob.glob(newestdirectory +"/*.csv")))
         for filename in csvs:
-            with open(filename, "r") as csvfile:
-                reader = list(csv.DictReader(csvfile))
-            # if list(reader[0].keys()) != lineheaders:
-            #     print(list(reader[0].keys()))
-            #     print("CSV input file " + filename + " has different headers than we're looking for. Not importing.")
-            # else:
-            #     print("CSV input file " + filename + " seems to fit Elex standard. Importing.")
-                for row in reader:
-                    masterlist.append(row)
+            if '/snapshots/Florida/' not in filename:
+                with open(filename, "r") as csvfile:
+                    reader = list(csv.DictReader(csvfile))
+                # if list(reader[0].keys()) != lineheaders:
+                #     print(list(reader[0].keys()))
+                #     print("CSV input file " + filename + " has different headers than we're looking for. Not importing.")
+                # else:
+                #     print("CSV input file " + filename + " seems to fit Elex standard. Importing.")
+                    for row in reader:
+                        masterlist.append(row)
     with open('resultscomposite.csv', "w", newline="") as compositefile:
         writer = csv.DictWriter(compositefile, fieldnames=lineheaders)
         writer.writeheader()
@@ -52,11 +53,11 @@ def composite_csvs():
 
     csvfile = open('resultscomposite.csv', 'r')
     jsonfile = open('resultscomposite.json', 'w')
-
+    data = []
     fieldnames = lineheaders
     reader = csv.DictReader(csvfile, fieldnames)
     for row in reader:
-        json.dump(row, jsonfile)
-        jsonfile.write('\n')
+        data.append(row)
+    jsonfile.write(json.dumps(data, jsonfile))
 
 composite_csvs()
