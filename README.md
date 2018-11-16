@@ -11,7 +11,7 @@ This is an effort to parse county-level results for Miami-Dade, Broward, Monroe 
   * `python Broward.py` Broward County scraper
   * `python Monroe.py` Monroe County scraper
   * `python Manatee.py` Manatee County scraper
-  * `python resultscomposite.py` Merges all of the county results into one Elex-formatted csv and spits out `resultscomposite.json`
+  * `python composite_csvs.py` Merges all of the county results into one Elex-formatted csv and spits out `resultscomposite.json`. This currently commented out becasue the Herald wound up not using it.
   * `python calculations.py` Does all of the math for the races and spits out `stateagg.json` and `countyagg.json` for an aggregate count of the races
 
 ## The Data
